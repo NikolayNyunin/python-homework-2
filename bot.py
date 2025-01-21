@@ -1,4 +1,4 @@
-from config import BOT_TOKEN
+from config import BOT_TOKEN, LoggingMiddleware
 
 from aiogram import Bot, Dispatcher
 from aiogram.types import Message
@@ -7,6 +7,7 @@ import asyncio
 
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
+dp.message.middleware(LoggingMiddleware())
 
 
 @dp.message()
