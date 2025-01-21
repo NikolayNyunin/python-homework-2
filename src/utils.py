@@ -4,7 +4,7 @@ import aiohttp
 
 
 async def calculate_water_target(weight: float, city: str) -> int:
-    """Вычисление цели потребления воды."""
+    """Вычисление цели потребления воды (в мл)."""
 
     result = weight * 30
     status, temperature = await get_current_temperature(city)
@@ -14,7 +14,7 @@ async def calculate_water_target(weight: float, city: str) -> int:
 
 
 async def calculate_calorie_target(weight: float, height: float, age: float) -> int:
-    """Вычисление цели потребления калорий."""
+    """Вычисление цели потребления калорий (в ккал)."""
 
     return round(10 * weight + 6.25 * height - 5 * age)
 

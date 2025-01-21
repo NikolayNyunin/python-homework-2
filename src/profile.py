@@ -95,7 +95,7 @@ async def set_activity_time(message: Message, state: FSMContext):
         else:
             await state.update_data(activity_time=activity_time)
             await state.set_state(ProfileSetup.city)
-            await message.answer('В каком городе вы находитесь?')
+            await message.answer('В каком городе вы находитесь? (напишите название по-английски)')
 
 
 @router.message(ProfileSetup.city)
@@ -106,12 +106,12 @@ async def set_city(message: Message, state: FSMContext):
     # TODO: implement city validation
     await state.update_data(city=city)
     await state.set_state(ProfileSetup.calorie_target)
-    await message.answer('Какая у вас цель потребления калорий? (для автоматического вычисления введите 0)')
+    await message.answer('Какая у вас цель потребления калорий (в ккал)? (для автоматического вычисления введите 0)')
 
 
 @router.message(ProfileSetup.calorie_target)
 async def set_calorie_target(message: Message, state: FSMContext):
-    """Задание цели потребления калорий."""
+    """Задание цели потребления калорий (в ккал)."""
 
     # Валидация цели потребления калорий
     try:
@@ -120,7 +120,7 @@ async def set_calorie_target(message: Message, state: FSMContext):
         await message.answer('Введено некорректное значение цели потребления калорий, повторите попытку')
     else:
         if calorie_target < 0 or calorie_target > 10000:
-            await message.answer('Введённая цель потребления калорий выходит из допустимого диапазона (0, 10000) калорий')
+            await message.answer('Введённая цель потребления калорий выходит из допустимого диапазона (0, 10000) ккал')
         else:
             await state.update_data(calorie_target=calorie_target)
             data = await state.get_data()

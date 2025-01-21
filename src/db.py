@@ -45,7 +45,7 @@ async def update_data(user_id: int) -> None:
         data['burned_calories'] = 0
         data['date'] = date.today()
 
-    logger.info(f'Данные пользователя {user_id} обновлены')
+        logger.success(f'Данные пользователя {user_id} обновлены')
 
 
 async def log_water(user_id: int, water_volume: int) -> None:
