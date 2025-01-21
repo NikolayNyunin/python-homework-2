@@ -1,5 +1,5 @@
-from config import BOT_TOKEN, LoggingMiddleware
-from profile import router
+from src.config import BOT_TOKEN, LoggingMiddleware
+from src.profile import router
 
 from aiogram import Bot, Dispatcher
 from aiogram.filters import Command
