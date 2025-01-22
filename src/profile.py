@@ -6,7 +6,7 @@ from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 
-router = Router()
+profile_router = Router()
 
 
 class ProfileSetup(StatesGroup):
@@ -18,7 +18,7 @@ class ProfileSetup(StatesGroup):
     calorie_target = State()
 
 
-@router.message(Command('set_profile'))
+@profile_router.message(Command('set_profile'))
 async def set_profile_command(message: Message, state: FSMContext):
     """Начало настройки профиля пользователя."""
 
@@ -26,7 +26,7 @@ async def set_profile_command(message: Message, state: FSMContext):
     await message.answer('Введите ваш вес (в кг):')
 
 
-@router.message(ProfileSetup.weight)
+@profile_router.message(ProfileSetup.weight)
 async def set_weight(message: Message, state: FSMContext):
     """Задание веса."""
 
@@ -44,7 +44,7 @@ async def set_weight(message: Message, state: FSMContext):
             await message.answer('Введите ваш рост (в см):')
 
 
-@router.message(ProfileSetup.height)
+@profile_router.message(ProfileSetup.height)
 async def set_height(message: Message, state: FSMContext):
     """Задание роста."""
 
@@ -62,7 +62,7 @@ async def set_height(message: Message, state: FSMContext):
             await message.answer('Введите ваш возраст:')
 
 
-@router.message(ProfileSetup.age)
+@profile_router.message(ProfileSetup.age)
 async def set_age(message: Message, state: FSMContext):
     """Задание возраста."""
 
@@ -80,7 +80,7 @@ async def set_age(message: Message, state: FSMContext):
             await message.answer('Сколько минут активности у вас в день?')
 
 
-@router.message(ProfileSetup.activity_time)
+@profile_router.message(ProfileSetup.activity_time)
 async def set_activity_time(message: Message, state: FSMContext):
     """Задание времени активности."""
 
@@ -98,7 +98,7 @@ async def set_activity_time(message: Message, state: FSMContext):
             await message.answer('В каком городе вы находитесь? (напишите название по-английски)')
 
 
-@router.message(ProfileSetup.city)
+@profile_router.message(ProfileSetup.city)
 async def set_city(message: Message, state: FSMContext):
     """Задание города проживания."""
 
@@ -109,7 +109,7 @@ async def set_city(message: Message, state: FSMContext):
     await message.answer('Какая у вас цель потребления калорий (в ккал)? (для автоматического вычисления введите 0)')
 
 
-@router.message(ProfileSetup.calorie_target)
+@profile_router.message(ProfileSetup.calorie_target)
 async def set_calorie_target(message: Message, state: FSMContext):
     """Задание цели потребления калорий (в ккал)."""
 

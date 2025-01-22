@@ -1,10 +1,10 @@
 from src.config import BOT_TOKEN, LoggingMiddleware
-from src.profile import router
+from src.profile import profile_router
 from src.db import log_water, log_consumed_calories, log_burned_calories, get_progress
 
-from aiogram import Bot, Dispatcher
+from aiogram import Bot, Dispatcher, Router
 from aiogram.filters import Command, CommandStart, CommandObject
-from aiogram.types import Message, Update
+from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 from loguru import logger
 
@@ -12,7 +12,7 @@ import asyncio
 
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
-dp.include_router(router)
+dp.include_router(profile_router)
 dp.message.outer_middleware(LoggingMiddleware())
 
 
@@ -117,10 +117,16 @@ async def check_progress_command(message: Message):
         )
 
 
-# @dp.update()
-# async def unknown_action(update: Update):
-#     if update.message is not None:
-#         await update.message.answer(f'Команда не распознана: "{update.message.text}"')
+final_router = Router()
+dp.include_router(final_router)
+
+
+@final_router.message()
+async def unrecognized_message(message: Message):
+    """Обработка не пойманных ранее сообщений."""
+
+    logger.error(f'Команда не распознана: "{message.text}"')
+    await message.answer(f'Команда не распознана: "{message.text}"')
 
 
 async def main() -> None:
