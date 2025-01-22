@@ -123,4 +123,26 @@ $\text{calorie target} = 10 * \text{weight} + 6.25 * \text{height} - 5 * \text{a
 
 ## Примеры работы
 
-[//]: # (TODO: add examples)
+### Начало работы с ботом:
+
+![Example 1](img/example_1.jpg)
+
+### Команда `/set_profile`:
+
+![Example 2](img/example_2.jpg)
+
+### Команда `/log_water`:
+
+![Example 3](img/example_3.jpg)
+
+### Команда `/log_food`:
+
+![Example 4](img/example_4.jpg)
+
+### Команда `/log_workout`:
+
+![Example 5](img/example_5.jpg)
+
+### Команда `/check_progress`:
+
+![Example 6](img/example_6.jpg)
