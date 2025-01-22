@@ -90,3 +90,19 @@ async def get_progress(user_id: int) -> dict:
         'logged_calories': data['logged_calories'],
         'burned_calories': data['burned_calories']
     }
+
+
+async def get_user_weight(user_id: int) -> float:
+    """Получить вес пользователя."""
+
+    logger.info(f'Вес пользователя {user_id} получен')
+
+    return user_data[user_id]['weight']
+
+
+async def increase_water_target(user_id: int, water_volume: int) -> None:
+    """Увеличить дневную цель потребления воды."""
+
+    user_data[user_id]['water_target'] += water_volume
+
+    logger.info(f'Дневная цель по воде пользователя {user_id} увеличена на {water_volume} мл')

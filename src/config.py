@@ -10,6 +10,8 @@ load_dotenv()
 
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 WEATHER_API_KEY = os.getenv('WEATHER_API_KEY')
+NUTRITION_API_KEY = os.getenv('NUTRITION_API_KEY')
+WORKOUT_API_KEY = os.getenv('WORKOUT_API_KEY')
 
 
 class LoggingMiddleware(BaseMiddleware):
