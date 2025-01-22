@@ -19,16 +19,12 @@ dp.include_router(profile_router)
 dp.message.outer_middleware(LoggingMiddleware())
 
 
-class ConfirmationState(StatesGroup):
-    awaiting_confirmation = State()
-
-
 @dp.message(CommandStart())
 async def start_command(message: Message):
     """Начало взаимодействия с ботом."""
 
     await message.answer(
-        'Привет! Я — бот, позволяющий отслеживать потребление воды и расход калорий.\n'
+        '👋 Привет! Я — бот, позволяющий отслеживать потребление воды и расход калорий.\n'
         'Используйте команду /help для просмотра списка поддерживаемых команд.'
     )
 
@@ -40,12 +36,12 @@ async def help_command(message: Message):
     await message.answer(
         'Я могу помочь в отслеживании потребления воды и расхода калорий.\n'
         'Список реализованных команд:\n'
-        '- /set_profile — настроить профиль пользователя (очищает все сохранённые ранее данные);\n'
-        '- /log_water <объём воды в мл> — записать потребление воды;\n'
-        '- /log_food <название блюда на английском> <размер порции в г> — записать приём пищи;\n'
-        '- /log_workout <тип тренировки на английском> <время в мин> — записать физическую тренировку;\n'
-        '- /check_progress — вывести прогресс в выполнении дневных целей;\n'
-        '- /cancel — отменить текущее действие.'
+        '🔐 /set_profile — настроить профиль пользователя (очищает все сохранённые ранее данные);\n'
+        '💧 /log_water <объём воды в мл> — записать потребление воды;\n'
+        '🌭 /log_food <название блюда на английском> <размер порции в г> — записать приём пищи;\n'
+        '🏃 /log_workout <тип тренировки на английском> <время в мин> — записать физическую тренировку;\n'
+        '📊 /check_progress — вывести прогресс в выполнении дневных целей;\n'
+        '❌ /cancel — отменить текущее действие.'
     )
 
 
@@ -55,10 +51,10 @@ async def cancel_command(message: Message, state: FSMContext):
 
     current_state = await state.get_state()
     if current_state is None:
-        await message.answer('В данный момент нечего отменять')
+        await message.answer('❌ В данный момент нечего отменять')
     else:
         await state.clear()
-        await message.answer('Действие отменено')
+        await message.answer('✅ Действие отменено')
 
 
 @dp.message(Command('log_water'))
@@ -68,27 +64,31 @@ async def log_water_command(message: Message, command: CommandObject):
     # Валидация потреблённого объёма воды
     water_volume = command.args
     if water_volume is None:
-        await message.answer('Отсутствует объём потреблённой воды (в мл)')
+        await message.answer('❌ Отсутствует объём потреблённой воды (в мл)')
         return
 
     try:
         water_volume = int(water_volume)
     except ValueError:
-        await message.answer('Передано некорректное значение объёма воды')
+        await message.answer('❌ Передано некорректное значение объёма воды')
         return
 
     if water_volume < 0 or water_volume > 3000:
-        await message.answer('Введённый объём воды выходит из допустимого диапазона (0, 3000) мл')
+        await message.answer('❌ Введённый объём воды выходит из допустимого диапазона (0, 3000) мл')
         return
 
     try:
         await log_water(message.from_user.id, water_volume)
     except KeyError:
-        await message.answer('Профиль пользователя не настроен! Сначала используйте команду /set_profile.')
+        await message.answer('❌ Профиль пользователя не настроен! Сначала используйте команду /set_profile.')
     else:
         data = await get_progress(message.from_user.id)
-        await message.answer('Выпитая вода записана! '
-                             f'Прогресс за день: {data["logged_water"]}/{data["water_target"]} мл.')
+        await message.answer('💧 Выпитая вода записана! '
+                             f'💦 Прогресс за день: {data["logged_water"]}/{data["water_target"]} мл.')
+
+
+class ConfirmationState(StatesGroup):
+    awaiting_confirmation = State()
 
 
 @dp.message(Command('log_food'))
@@ -97,34 +97,34 @@ async def log_food_command(message: Message, command: CommandObject, state: FSMC
 
     # Валидация названия и количества пищи
     if command.args is None:
-        await message.answer('Отсутствуют название и количество пищи')
+        await message.answer('❌ Отсутствуют название и количество пищи')
         return
 
     try:
         food_name, serving_size = command.args.split()
         serving_size = int(serving_size)
     except ValueError:
-        await message.answer('Некорректный формат входных данных, введите данные в формате\n'
-                             '/log_food <название блюда на английском> <размер порции в г>.')
+        await message.answer('❌ Некорректный формат входных данных, введите данные в формате\n'
+                             '/log_food <название блюда на английском> <размер порции в г>')
         return
 
     if serving_size < 0 or serving_size > 1000:
-        await message.answer('Введённый размер порции выходит из допустимого диапазона (0, 1000) г')
+        await message.answer('❌ Введённый размер порции выходит из допустимого диапазона (0, 1000) г')
         return
 
     status, food_data = await get_food_nutrition(food_name)
     if status != 0:
-        await message.answer('Ошибка получения калорийности пищи')
+        await message.answer('❌ Ошибка получения калорийности пищи')
     else:
         calories = food_data['calories'] / 100 * serving_size
         await state.update_data(mode='food', calories=calories)
         await state.set_state(ConfirmationState.awaiting_confirmation)
         await message.answer(
-            'Найденная еда:\n'
+            '🌭 Найденная еда:\n'
             f'Название: {food_data["name"]}\n'
             f'Размер порции: {serving_size} г\n'
             f'Общая калорийность: {calories} ккал\n'
-            'Всё верно? (да/нет)'
+            'Всё верно? (да✅/нет❌)'
         )
 
 
@@ -134,39 +134,39 @@ async def log_workout_command(message: Message, command: CommandObject, state: F
 
     # Валидация названия и продолжительности тренировки
     if command.args is None:
-        await message.answer('Отсутствуют название и продолжительность тренировки')
+        await message.answer('❌ Отсутствуют название и продолжительность тренировки')
         return
 
     try:
         workout_name, duration = command.args.split()
         duration = int(duration)
     except ValueError:
-        await message.answer('Некорректный формат входных данных, введите данные в формате\n'
-                             '/log_workout <тип тренировки на английском> <время в мин>.')
+        await message.answer('❌ Некорректный формат входных данных, введите данные в формате\n'
+                             '/log_workout <тип тренировки на английском> <время в мин>')
         return
 
     if duration < 0 or duration > 1440:
-        await message.answer('Введённая продолжительность тренировки выходит из допустимого диапазона (0, 1440) мин')
+        await message.answer('❌ Введённая продолжительность тренировки выходит из допустимого диапазона (0, 1440) мин')
         return
 
     try:
         weight = await get_user_weight(message.from_user.id)
     except KeyError:
-        await message.answer('Профиль пользователя не настроен! Сначала используйте команду /set_profile.')
+        await message.answer('❌ Профиль пользователя не настроен! Сначала используйте команду /set_profile.')
         return
 
     status, workout_data = await get_workout_calories_burned(workout_name, weight, duration)
     if status != 0:
-        await message.answer('Ошибка получения интенсивности тренировки')
+        await message.answer('❌ Ошибка получения интенсивности тренировки')
     else:
         await state.update_data(mode='workout', calories=workout_data['calories'], duration=duration)
         await state.set_state(ConfirmationState.awaiting_confirmation)
         await message.answer(
-            'Найденная тренировка:\n'
+            '🏃 Найденная тренировка:\n'
             f'Название: {workout_data["name"]}\n'
             f'Длительность: {duration} мин\n'
             f'Потраченные калории: {workout_data["calories"]} ккал\n'
-            'Всё верно? (да/нет)'
+            'Всё верно? (да✅/нет❌)'
         )
 
 
@@ -182,25 +182,25 @@ async def confirm_message(message: Message, state: FSMContext):
                 await log_consumed_calories(message.from_user.id, calories)
                 p_data = await get_progress(message.from_user.id)
                 await state.clear()
-                await message.answer('Приём пищи записан! '
-                                     f'Прогресс за день: {p_data["logged_calories"]}/{p_data["calorie_target"]} ккал.')
+                await message.answer('🌭 Приём пищи записан! '
+                                     f'😋 Прогресс за день: {p_data["logged_calories"]}/{p_data["calorie_target"]} ккал.')
             else:
                 await log_burned_calories(message.from_user.id, calories)
                 extra_water = 200 * (data['duration'] // 30)
                 await increase_water_target(message.from_user.id, extra_water)
                 p_data = await get_progress(message.from_user.id)
                 await state.clear()
-                await message.answer(f'Тренировка записана! Добавлено {extra_water} мл воды к дневной цели.\n'
-                                     f'Сожжено за день: {p_data["burned_calories"]} ккал\n'
-                                     f'Вода за день: {p_data["logged_water"]}/{p_data["water_target"]} мл')
+                await message.answer(f'🏃 Тренировка записана! 💧 Добавлено {extra_water} мл воды к дневной цели.\n'
+                                     f'🔥 Сожжено за день: {p_data["burned_calories"]} ккал\n'
+                                     f'💦 Вода за день: {p_data["logged_water"]}/{p_data["water_target"]} мл')
         elif message.text.lower() in ('нет', 'no'):
             await state.clear()
-            await message.answer('Запись отменена')
+            await message.answer('✅ Запись отменена')
         else:
-            await message.answer('Ответ не распознан, повторите попытку')
+            await message.answer('❌ Ответ не распознан, повторите попытку')
     except KeyError:
         await state.clear()
-        await message.answer('Профиль пользователя не настроен! Сначала используйте команду /set_profile.')
+        await message.answer('❌ Профиль пользователя не настроен! Сначала используйте команду /set_profile.')
 
 
 @dp.message(Command('check_progress'))
@@ -210,14 +210,14 @@ async def check_progress_command(message: Message):
     try:
         data = await get_progress(message.from_user.id)
     except KeyError:
-        await message.answer('Профиль пользователя не настроен! Сначала используйте команду /set_profile.')
+        await message.answer('❌ Профиль пользователя не настроен! Сначала используйте команду /set_profile.')
     else:
         await message.answer(
-            'Дневной прогресс:\n'
-            f'Вода: выпито {data["logged_water"]}/{data["water_target"]} мл.\n'
+            '📊 Дневной прогресс:\n'
+            f'💦 Вода: выпито {data["logged_water"]}/{data["water_target"]} мл.\n'
             'Калории:\n'
-            f'- Поглощено {data["logged_calories"]}/{data['calorie_target']} ккал;\n'
-            f'- Сожжено {data["burned_calories"]} ккал.'
+            f'😋 Поглощено {data["logged_calories"]}/{data['calorie_target']} ккал;\n'
+            f'🔥 Сожжено {data["burned_calories"]} ккал.'
         )
 
 
@@ -230,7 +230,7 @@ async def unrecognized_message(message: Message):
     """Обработка не пойманных ранее сообщений."""
 
     logger.error(f'Команда не распознана: "{message.text}"')
-    await message.answer(f'Команда не распознана: "{message.text}"')
+    await message.answer(f'❌ Команда не распознана: "{message.text}"')
 
 
 async def main() -> None:
