@@ -18,7 +18,7 @@ async def set_profile(user_id: int, weight: float, height: float, age: float,
         'age': age,
         'activity_time': activity_time,
         'city': city,
-        'water_target': await calculate_water_target(weight, city),
+        'water_target': await calculate_water_target(weight, activity_time, city),
         'calorie_target': calorie_target if calorie_target != 0
             else await calculate_calorie_target(weight, height, age),
         'logged_water': 0,
@@ -39,7 +39,8 @@ async def update_data(user_id: int) -> None:
 
     data = user_data[user_id]
     if data['date'] != date.today():
-        data['water_target'] = await calculate_water_target(data['weight'], data['city'])
+        data['water_target'] = \
+            await calculate_water_target(data['weight'], data['activity_time'], data['city'])
         data['logged_water'] = 0
         data['logged_calories'] = 0
         data['burned_calories'] = 0

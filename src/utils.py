@@ -3,10 +3,11 @@ from src.config import WEATHER_API_KEY, NUTRITION_API_KEY, WORKOUT_API_KEY
 import aiohttp
 
 
-async def calculate_water_target(weight: float, city: str) -> int:
+async def calculate_water_target(weight: float, activity_time: int, city: str) -> int:
     """Вычисление цели потребления воды (в мл)."""
 
     result = weight * 30
+    result += 500 * (activity_time // 30)
     status, temperature = await get_current_temperature(city)
     if status == 0 and temperature > 25:
         result += 750
