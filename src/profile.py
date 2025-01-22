@@ -6,6 +6,8 @@ from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 
+import re
+
 profile_router = Router()
 
 
@@ -103,10 +105,12 @@ async def set_city(message: Message, state: FSMContext):
     """Задание города проживания."""
 
     city = message.text
-    # TODO: implement city validation
-    await state.update_data(city=city)
-    await state.set_state(ProfileSetup.calorie_target)
-    await message.answer('Какая у вас цель потребления калорий (в ккал)? (для автоматического вычисления введите 0)')
+    if not bool(re.fullmatch(r'[A-Z][a-z]+(?:[\s-][A-Z][a-z]+)*', city)):
+        await message.answer('Некорректное название города')
+    else:
+        await state.update_data(city=city)
+        await state.set_state(ProfileSetup.calorie_target)
+        await message.answer('Какая у вас цель потребления калорий (в ккал)? (для автоматического вычисления введите 0)')
 
 
 @profile_router.message(ProfileSetup.calorie_target)
