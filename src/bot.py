@@ -101,7 +101,8 @@ async def log_food_command(message: Message, command: CommandObject, state: FSMC
         return
 
     try:
-        food_name, serving_size = command.args.split()
+        args = command.args.split()
+        food_name, serving_size = ' '.join(args[:-1]), args[-1]
         serving_size = int(serving_size)
     except ValueError:
         await message.answer('❌ Некорректный формат входных данных, введите данные в формате\n'
@@ -138,7 +139,8 @@ async def log_workout_command(message: Message, command: CommandObject, state: F
         return
 
     try:
-        workout_name, duration = command.args.split()
+        args = command.args.split()
+        workout_name, duration = ' '.join(args[:-1]), args[-1]
         duration = int(duration)
     except ValueError:
         await message.answer('❌ Некорректный формат входных данных, введите данные в формате\n'
@@ -238,6 +240,7 @@ async def main() -> None:
 
     try:
         logger.info('Polling запущен')
+        # TODO: заменить polling на webhooks
         await dp.start_polling(bot)
     finally:
         logger.info('Polling прекращён')
